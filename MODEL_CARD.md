@@ -36,7 +36,7 @@ are mixed with direct distribution losses computed over the candidate slice.
 The training code, the exact hyper-parameters, the loss weights and the per-source data mix are
 **not released**. What ships is enough to run, evaluate and reproduce the measurements below; it is
 not enough to re-train the model. Source names, licences and the zero-overlap check against the
-evaluation sets are in [docs/DATA_SOURCES.md](docs/DATA_SOURCES.md).
+evaluation sets are in [docs/DATA_SOURCES.md](https://github.com/simin-yuan/lightemerge-decide/blob/master/docs/DATA_SOURCES.md).
 
 ## Evaluation
 
@@ -75,7 +75,7 @@ All four sets were evaluated on GPU in bfloat16, the same precision used in trai
 Per-ruler source files: `evidence/base_*.json` (prior baseline), `evidence/arm3_*.json` (this release).
 
 `prior-baseline` is an **earlier internal fine-tune of the same base model**, not the raw base
-weights; it is the checkpoint this release was trained against. The raw `Qwen/Qwen3.5-0.8B-Base` is
+weights; it is the checkpoint this release is compared against. The raw `Qwen/Qwen3.5-0.8B-Base` is
 deliberately not tabulated: its run left 35 of 266 `pub231` items unscored because it did not emit a
 parseable answer, so its numbers are not comparable with the rows below.
 
@@ -119,9 +119,9 @@ checks, both on real evaluation prompts (one prompt per question type, chosen fr
 - 0.8B capacity: on hard unseen question templates the model is close to chance-corrected zero
   (`valhard` Int 8.46). It does not reason its way out of a domain shift; it reports that it is
   unsure, which is often the useful behaviour but is not competence.
-- **Over-confidence at evaluation time is real**: on `judge260` the model's Int is 1.54 while its
-  Cal is 80.26 — a high Cap there is a statement about honest distributions, not about decision
-  quality. Do not quote Cap without Int next to it.
+- **High calibration is not high accuracy**: on `judge260` the model's Int is 1.54 (barely above
+  chance-corrected zero) while its Cal is 80.26 — the high Cal means its probabilities track the base
+  rates honestly, not that its decisions are good. Do not quote Cap without Int next to it.
 - Calibration degrades when examples are drawn from a different distribution: adding 14,600 more
   rows of a different mixture (the "final" ablation, not released) lowered local `pub231`
   calibration from 64.28 to 54.98 while raising accuracy from 0.5801 to 0.6061. The two axes trade
