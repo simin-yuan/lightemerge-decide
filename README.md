@@ -8,7 +8,7 @@ probability distribution over those candidates plus the chosen answer.
 - Three question types: categorical choice (N labels), binary yes/no, ordinal score (N levels)
 - Native distributions — the probabilities come from the model's own next-token distribution over
   the candidate labels, not from a post-hoc temperature fit
-- p50 latency 0.05 s per decision on a single RTX 4090D in bfloat16
+- p50 latency 0.05 s per decision on a single 24 GB consumer GPU in bfloat16
 
 This is the v1.0 release: one training run, one checkpoint. Nothing was tuned against the
 evaluation sets, and the training code and recipe are not part of this release.
@@ -114,4 +114,4 @@ targets and the public benchmark whose interface contract this code follows.
 
 ## Author
 
-Simin Yuan
+Simin Yuan (LightEmerge Ltd.)

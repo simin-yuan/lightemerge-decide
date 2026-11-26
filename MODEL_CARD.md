@@ -88,7 +88,7 @@ not decisions. On `judge260` the model reaches Cap 40.90 mostly through calibrat
 
 ### Latency
 
-p50 0.05 s per single-decision round trip, measured on one RTX 4090D, bfloat16, batch 1, local
+p50 0.05 s per single-decision round trip, measured on a single 24 GB consumer GPU, bfloat16, batch 1, local
 loopback (no network). For reference, the leaderboard ranks on `2 × measured + 150 ms`, which for
 this model is ≈ 0.25 s.
 
@@ -135,4 +135,4 @@ Apache-2.0. See [NOTICE](NOTICE).
 
 ## Author
 
-Simin Yuan
+Simin Yuan (LightEmerge Ltd.)
