@@ -1,5 +1,7 @@
 # LightEmerge-Decide-0.8B
 
+**Try it in the browser — free, no install, no VPN:** [ModelScope Studio demo](https://www.modelscope.cn/studios/ySimon/LightEmerge-Decide-08B-Demo) · run one decision, see the distribution over candidates, `0` tokens generated.
+
 A 0.8B-parameter model that makes **structured decisions with calibrated probabilities**.
 Give it a state description and a question with a fixed set of labels or levels; it returns a
 probability distribution over those candidates plus the chosen answer.
