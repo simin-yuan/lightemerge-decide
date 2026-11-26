@@ -1,0 +1,48 @@
+{
+ "arm": "arm3",
+ "ruler": "pub434",
+ "source": "ev_arm3_pub434.json",
+ "n": 434,
+ "intelligence": 41.8,
+ "calibration": 43.67,
+ "capability": 42.73,
+ "detail": {
+  "source": "ev_arm3_pub434.json",
+  "n": 434,
+  "official_formula": {
+   "intelligence": 41.8,
+   "calibration": 43.67,
+   "capability": 42.73,
+   "calibration_by_type": {
+    "noul": 70.29,
+    "score": 17.06
+   },
+   "tiers": [
+    {
+     "tier": "standard",
+     "n": 434,
+     "acc": 0.6567,
+     "chance": 0.4101,
+     "intelligence": 41.8,
+     "weight": 0.28
+    }
+   ]
+  },
+  "local": {
+   "accuracy": 0.6567,
+   "noul_balanced_accuracy": 0.8125,
+   "brier_multiclass": 0.4642,
+   "score_mae": 1.1299,
+   "by_type": {
+    "noul": {
+     "n": 304,
+     "acc": 0.8125
+    },
+    "score": {
+     "n": 130,
+     "acc": 0.2923
+    }
+   }
+  }
+ }
+}

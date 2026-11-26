@@ -1,0 +1,53 @@
+{
+ "arm": "arm3",
+ "ruler": "valhard",
+ "source": "ev_arm3_valhard.json",
+ "n": 150,
+ "intelligence": 8.46,
+ "calibration": 25.03,
+ "capability": 16.75,
+ "detail": {
+  "source": "ev_arm3_valhard.json",
+  "n": 150,
+  "official_formula": {
+   "intelligence": 8.46,
+   "calibration": 25.03,
+   "capability": 16.75,
+   "calibration_by_type": {
+    "choice": -22.69,
+    "noul": 77.21,
+    "score": 20.58
+   },
+   "tiers": [
+    {
+     "tier": "standard",
+     "n": 150,
+     "acc": 0.3867,
+     "chance": 0.33,
+     "intelligence": 8.46,
+     "weight": 0.28
+    }
+   ]
+  },
+  "local": {
+   "accuracy": 0.3867,
+   "noul_balanced_accuracy": 0.5774,
+   "brier_multiclass": 0.7795,
+   "score_mae": 0.7837,
+   "by_type": {
+    "choice": {
+     "n": 45,
+     "acc": 0.1111
+    },
+    "noul": {
+     "n": 45,
+     "acc": 0.5778
+    },
+    "score": {
+     "n": 60,
+     "acc": 0.45
+    }
+   }
+  }
+ }
+}

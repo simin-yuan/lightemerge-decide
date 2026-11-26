@@ -1,0 +1,63 @@
+LightEmerge-Decide-0.8B
+Copyright 2026 Simin Yuan
+
+Licensed under the Apache License, Version 2.0 (see LICENSE).
+
+This release contains model weights derived from third-party work and references third-party
+specifications. Attribution follows.
+
+--------------------------------------------------------------------------------
+1. Base model
+--------------------------------------------------------------------------------
+Qwen3.5-0.8B-Base
+Copyright Alibaba Cloud, Qwen team
+Licensed under the Apache License, Version 2.0
+https://huggingface.co/Qwen/Qwen3.5-0.8B-Base
+
+The released weights are a fine-tuned derivative of this model. The upstream model card and licence
+must be consulted for the upstream terms.
+
+--------------------------------------------------------------------------------
+2. Teacher model (training-time only, not redistributed)
+--------------------------------------------------------------------------------
+Qwen3.5-27B
+Copyright Alibaba Cloud, Qwen team
+Licensed under the Apache License, Version 2.0
+https://huggingface.co/Qwen/Qwen3.5-27B
+
+Used to generate soft probability targets over the candidate labels for part of the training data.
+No teacher weights are included in this release.
+
+--------------------------------------------------------------------------------
+3. Benchmark interface and metric definitions
+--------------------------------------------------------------------------------
+jevbench
+Copyright (c) 2026 Florian Standhartinger and contributors
+Licensed under the MIT License
+https://github.com/fstandhartinger/jevbench
+
+The HTTP wire contract, candidate-scoring semantics and Intelligence / Calibration / Capability
+definitions implemented in scripts/serve_systemone.py, scripts/promptfmt.py and
+scripts/score_official.py follow this project's published specification. No source code from that
+repository is copied into this release; this notice is carried for attribution.
+
+--------------------------------------------------------------------------------
+4. Training data
+--------------------------------------------------------------------------------
+Public datasets used in training are listed, with their licences, in
+docs/DATA_SOURCES.md:
+
+  banking77        CC-BY-4.0   (PolyAI)
+  HelpSteer2       CC-BY-4.0   (NVIDIA)
+  CUAD             CC-BY-4.0   (The Atticus Project)
+  ECTHR_A / ECTHR_B  HF CC-BY-4.0, original ECHR-OD under ODbL (coastalcph/lex_glue)
+  LEDGAR           AFL-3.0     (via coastalcph/lex_glue)
+
+No dataset text is redistributed in this repository or in the released weights; only model
+parameters trained on it are.
+
+--------------------------------------------------------------------------------
+5. Runtime dependencies (not vendored)
+--------------------------------------------------------------------------------
+PyTorch (BSD-3-Clause), transformers (Apache-2.0), safetensors (Apache-2.0).
+These are installed by the user and are not bundled here.

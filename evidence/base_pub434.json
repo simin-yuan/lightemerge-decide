@@ -1,0 +1,48 @@
+{
+ "arm": "base",
+ "ruler": "pub434",
+ "source": "ev_base_pub434.json",
+ "n": 434,
+ "intelligence": 46.09,
+ "calibration": 40.65,
+ "capability": 43.37,
+ "detail": {
+  "source": "ev_base_pub434.json",
+  "n": 434,
+  "official_formula": {
+   "intelligence": 46.09,
+   "calibration": 40.65,
+   "capability": 43.37,
+   "calibration_by_type": {
+    "noul": 77.26,
+    "score": 4.03
+   },
+   "tiers": [
+    {
+     "tier": "standard",
+     "n": 434,
+     "acc": 0.682,
+     "chance": 0.4101,
+     "intelligence": 46.09,
+     "weight": 0.28
+    }
+   ]
+  },
+  "local": {
+   "accuracy": 0.682,
+   "noul_balanced_accuracy": 0.8586,
+   "brier_multiclass": 0.4179,
+   "score_mae": 1.1861,
+   "by_type": {
+    "noul": {
+     "n": 304,
+     "acc": 0.8586
+    },
+    "score": {
+     "n": 130,
+     "acc": 0.2692
+    }
+   }
+  }
+ }
+}

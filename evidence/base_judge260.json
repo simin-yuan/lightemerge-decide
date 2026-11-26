@@ -1,0 +1,43 @@
+{
+ "arm": "base",
+ "ruler": "judge260",
+ "source": "ev_base_judge260.json",
+ "n": 260,
+ "intelligence": 0.0,
+ "calibration": 33.14,
+ "capability": 16.57,
+ "detail": {
+  "source": "ev_base_judge260.json",
+  "n": 260,
+  "official_formula": {
+   "intelligence": 0.0,
+   "calibration": 33.14,
+   "capability": 16.57,
+   "calibration_by_type": {
+    "choice": 33.14
+   },
+   "tiers": [
+    {
+     "tier": "standard",
+     "n": 260,
+     "acc": 0.4923,
+     "chance": 0.5,
+     "intelligence": 0.0,
+     "weight": 0.28
+    }
+   ]
+  },
+  "local": {
+   "accuracy": 0.4923,
+   "noul_balanced_accuracy": null,
+   "brier_multiclass": 0.7255,
+   "score_mae": null,
+   "by_type": {
+    "choice": {
+     "n": 260,
+     "acc": 0.4923
+    }
+   }
+  }
+ }
+}

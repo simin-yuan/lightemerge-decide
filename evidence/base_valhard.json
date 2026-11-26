@@ -1,0 +1,53 @@
+{
+ "arm": "base",
+ "ruler": "valhard",
+ "source": "ev_base_valhard.json",
+ "n": 150,
+ "intelligence": 0.5,
+ "calibration": 17.28,
+ "capability": 8.89,
+ "detail": {
+  "source": "ev_base_valhard.json",
+  "n": 150,
+  "official_formula": {
+   "intelligence": 0.5,
+   "calibration": 17.28,
+   "capability": 8.89,
+   "calibration_by_type": {
+    "choice": -44.29,
+    "noul": 87.93,
+    "score": 8.2
+   },
+   "tiers": [
+    {
+     "tier": "standard",
+     "n": 150,
+     "acc": 0.3333,
+     "chance": 0.33,
+     "intelligence": 0.5,
+     "weight": 0.28
+    }
+   ]
+  },
+  "local": {
+   "accuracy": 0.3333,
+   "noul_balanced_accuracy": 0.5,
+   "brier_multiclass": 0.8953,
+   "score_mae": 0.7842,
+   "by_type": {
+    "choice": {
+     "n": 45,
+     "acc": 0.1111
+    },
+    "noul": {
+     "n": 45,
+     "acc": 0.5333
+    },
+    "score": {
+     "n": 60,
+     "acc": 0.35
+    }
+   }
+  }
+ }
+}

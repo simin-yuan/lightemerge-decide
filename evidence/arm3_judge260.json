@@ -1,0 +1,43 @@
+{
+ "arm": "arm3",
+ "ruler": "judge260",
+ "source": "ev_arm3_judge260.json",
+ "n": 260,
+ "intelligence": 1.54,
+ "calibration": 80.26,
+ "capability": 40.9,
+ "detail": {
+  "source": "ev_arm3_judge260.json",
+  "n": 260,
+  "official_formula": {
+   "intelligence": 1.54,
+   "calibration": 80.26,
+   "capability": 40.9,
+   "calibration_by_type": {
+    "choice": 80.26
+   },
+   "tiers": [
+    {
+     "tier": "standard",
+     "n": 260,
+     "acc": 0.5077,
+     "chance": 0.5,
+     "intelligence": 1.54,
+     "weight": 0.28
+    }
+   ]
+  },
+  "local": {
+   "accuracy": 0.5077,
+   "noul_balanced_accuracy": null,
+   "brier_multiclass": 0.5257,
+   "score_mae": null,
+   "by_type": {
+    "choice": {
+     "n": 260,
+     "acc": 0.5077
+    }
+   }
+  }
+ }
+}

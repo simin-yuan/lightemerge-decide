@@ -1,0 +1,6 @@
+{
+ "worst_dprob_reload": 0.012,
+ "note": "bf16 released artifact reloaded from disk (no adapter, no PEFT) vs fp32 merged reference",
+ "argmax_identical": true,
+ "items": 3
+}
