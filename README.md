@@ -39,9 +39,47 @@ model = AutoModelForCausalLM.from_pretrained(
 
 ## Use it as a service
 
-`scripts/serve_systemone.py` exposes a single-endpoint HTTP service that takes a state string plus
-a question object and returns `{"label": ..., "probs": {...}}`. See the docstring at the top of the
-file for the wire format.
+`scripts/serve_systemone.py` exposes a single-endpoint HTTP service: it takes a state string plus
+a question object and returns, per question, the chosen label and the full label distribution, along
+with token usage and the measured `latency_ms`. See the docstring at the top of the file for the wire
+format.
+
+One process, one GPU, nothing else to install or wire up:
+
+```bash
+pip install torch transformers accelerate
+python scripts/serve_systemone.py \
+  --base simin-yuan/LightEmerge-Decide-0.8B \
+  --device cuda --dtype bfloat16 \
+  --prompt-style sections --max-len 4096 \
+  --port 8000
+```
+
+`--base` is either this weights repository (merged bf16 weights, pulled straight from the hub) or a
+base checkpoint together with `--adapter <lora dir>`. The server generates no tokens: each request is
+one forward pass over the rendered prompt, and requests are handled one at a time on purpose
+(`HTTPServer`, not threaded), so concurrent clients queue — measure with a single client.
+
+Health check, then a single decision:
+
+```bash
+curl -s localhost:8000/health
+# {"ok": true, "model": "simin-yuan/LightEmerge-Decide-0.8B", "adapter": null}
+
+curl -s localhost:8000/v1/systemone -H 'Content-Type: application/json' -d '{
+  "state": "One interview slot on Friday; three candidates.",
+  "model": "lightemerge-decide-0.8b",
+  "questions": {"decision": {"type": "choice",
+    "instructions": "Who gets the slot?",
+    "criteria": {"A": "senior, expensive", "B": "junior, cheap", "C": "external, unknown"}}}
+}'
+# {"answers": {"decision": {"type": "choice", "choice": "<label>",
+#    "probabilities": {"<label>": <prob>, ...}}}, "usage": {...}, "latency_ms": <ms>}
+```
+
+Every candidate has to encode to exactly one token (single letters, or short labels); the server
+rejects the request instead of scoring a truncated one. A rendered prompt longer than `--max-len`
+also fails loudly rather than being cut in half.
 
 ## Evaluation
 
