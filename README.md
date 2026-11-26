@@ -16,17 +16,24 @@ evaluation sets, and the training code and recipe are not part of this release.
 ## Install
 
 ```bash
-pip install torch transformers
+pip install torch transformers accelerate
 ```
+
+`accelerate` is not optional on transformers 5.x: the loader imports it in
+`transformers/core_model_loading.py` even when you never pass `device_map`. Tested on torch 2.15.0
+(CPU) and transformers 5.24.0 with accelerate 1.16.0; the model itself is bf16 weights, no code is
+fetched from the hub at load time (`trust_remote_code=False` everywhere).
 
 ## Use it as a library
 
 ```python
+import torch
 from transformers import AutoModelForCausalLM, AutoTokenizer
 
 repo = "simin-yuan/LightEmerge-Decide-0.8B"    # Hugging Face weights repository
-tok = AutoTokenizer.from_pretrained(repo)
-model = AutoModelForCausalLM.from_pretrained(repo, dtype="bfloat16", device_map="auto")
+tok = AutoTokenizer.from_pretrained(repo, trust_remote_code=False)
+model = AutoModelForCausalLM.from_pretrained(
+    repo, torch_dtype=torch.bfloat16, trust_remote_code=False).to("cuda").eval()
 # Prompt construction and candidate scoring: see scripts/promptfmt.py and scripts/serve_systemone.py
 ```
 

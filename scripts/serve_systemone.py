@@ -48,9 +48,12 @@ class Reader:
             self.tok.pad_token = self.tok.eos_token
         torch_dtype = {"bfloat16": torch.bfloat16, "float16": torch.float16,
                        "float32": torch.float32}[dtype]
+        # No device_map here on purpose: device_map needs `accelerate` installed, and a
+        # clean container that only pip-installed torch+transformers fails at import time
+        # (transformers 5.x raises ImportError). .to(device) has no such dependency.
         self.model = AutoModelForCausalLM.from_pretrained(
-            base, torch_dtype=torch_dtype, device_map=device,
-            trust_remote_code=False).eval()
+            base, torch_dtype=torch_dtype,
+            trust_remote_code=False).to(device).eval()
         if adapter:
             from peft import PeftModel
             self.model = PeftModel.from_pretrained(self.model, adapter).eval()
@@ -108,7 +111,11 @@ class Reader:
         enc = {k: v.to(self.model.device) for k, v in enc.items()}
         # Only materialise the last position: full [vocab x seq] logits cost
         # ~2.5 GB per request at 4096 tokens and OOM-thrashed this box.
-        out = self.model(**enc, logits_to_keep=1)
+        try:
+            out = self.model(**enc, logits_to_keep=1)
+        except TypeError:
+            # transformers < 4.50 has no logits_to_keep; fall back to full logits.
+            out = self.model(**enc)
         logits = out.logits[0, -1]
         picked = torch.tensor([logits[i] for i in cand_ids], device=logits.device)
         p = torch.softmax(picked.float(), dim=-1).tolist()
