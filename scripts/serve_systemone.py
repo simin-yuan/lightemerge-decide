@@ -203,6 +203,13 @@ def make_handler(reader: Reader):
             if not isinstance(state, str) or not isinstance(questions, dict):
                 self._json(400, {"error": "need state (string or object) and a questions map"})
                 return
+            if not questions:
+                # A wrong key name would otherwise return 200 with zero answers and
+                # zero tokens, which a benchmark harness reads as "scored nothing,
+                # no error" and then reports as a result. Fail loudly instead.
+                self._json(400, {"error": "empty questions map; expected "
+                                          '{"state": ..., "questions": {"<id>": {"type": ...}}}'})
+                return
 
             answers, ntok = {}, 0
             for key, q in questions.items():
@@ -231,6 +238,11 @@ def make_handler(reader: Reader):
                     best = labels[max(range(len(p)), key=lambda i: p[i])]
                     answers[key] = {"id": key, "type": "choice", "choice": best,
                                     "probabilities": probs}
+
+            if not answers:
+                self._json(400, {"error": "no question produced an answer; each entry needs "
+                                          'a "type" of choice|score|noul'})
+                return
 
             self._json(200, {
                 "answers": answers,
