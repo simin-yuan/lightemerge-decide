@@ -193,7 +193,13 @@ def make_handler(reader: Reader):
             questions = body.get("questions") or {}
             # `state` may be a string or a JSON object (Decision Index format), never a guess.
             if isinstance(state, dict):
-                state = json.dumps(state, ensure_ascii=False, sort_keys=True)
+                # A raw json.dumps() buries list-valued fields (policy lists, tool
+                # schemas, turn histories) in one unbroken blob, which is not the
+                # shape this model was trained on. state_to_text renders dict
+                # states as readable bullets — the same conversion eval_local.py
+                # uses, so the served path and the evaluated path agree.
+                from eval_buckets import state_to_text
+                state = state_to_text(state)
             if not isinstance(state, str) or not isinstance(questions, dict):
                 self._json(400, {"error": "need state (string or object) and a questions map"})
                 return
