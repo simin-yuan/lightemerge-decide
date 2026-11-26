@@ -94,10 +94,53 @@ class Reader:
     # ------------------------------------------------------------ rendering
 
     def render(self, state: str, q: dict[str, Any]):
-        """Delegate to the shared formatter so train and serve cannot drift."""
+        """Delegate to the shared formatter so train and serve cannot drift.
+
+        Returns (prompt, labels, cand_ids). ``cand_ids`` is ``None`` when some
+        label needs more than one token (any question above 26 options): those
+        items are scored per option by :meth:`probs_multi` instead.
+        """
         from promptfmt import render_wire
         prompt, labels, cand_tokens = render_wire(state, q)
-        return prompt, labels, self._resolve(cand_tokens)
+        try:
+            return prompt, labels, self._resolve(cand_tokens)
+        except ValueError:
+            return prompt, labels, None, cand_tokens
+
+    @torch.inference_mode()
+    def probs_multi(self, prompt: str, token_strings: list[str]):
+        """Per-option scoring for labels that are not a single token.
+
+        The prompt is encoded once and every extra label token is fed through
+        the cache, so the cost is one long forward plus a few one-token steps.
+        """
+        import math
+        enc = self.tok(prompt, return_tensors="pt", add_special_tokens=False)
+        n = enc["input_ids"].shape[1]
+        if n > self.max_len:
+            raise ValueError(f"prompt is {n} tokens, above --max-len {self.max_len}; "
+                             "refusing to truncate")
+        enc = {k: v.to(self.model.device) for k, v in enc.items()}
+        try:
+            out = self.model(**enc, use_cache=True, logits_to_keep=1)
+        except TypeError:
+            out = self.model(**enc, use_cache=True)
+        past, logits = out.past_key_values, out.logits[0, -1]
+        scores = []
+        for text in token_strings:
+            ids = self.tok(text, add_special_tokens=False)["input_ids"]
+            total, cur, pk = 0.0, logits, past
+            for j, tid in enumerate(ids):
+                total += torch.log_softmax(cur.float(), dim=-1)[tid].item()
+                if j + 1 < len(ids):
+                    step = torch.tensor([[tid]], device=self.model.device)
+                    o = self.model(input_ids=step, past_key_values=pk, use_cache=True)
+                    cur, pk = o.logits[0, -1], o.past_key_values
+            scores.append(total)
+        m = max(scores)
+        ex = [math.exp(x - m) for x in scores]
+        ssum = sum(ex)
+        return [e / ssum for e in ex], n
 
     # ------------------------------------------------------------ inference
 
@@ -148,30 +191,43 @@ def make_handler(reader: Reader):
             t0 = time.perf_counter()
             state = body.get("state")
             questions = body.get("questions") or {}
-            q = questions.get("decision")
-            if not isinstance(state, str) or not isinstance(q, dict):
-                self._json(400, {"error": "need string state and questions.decision"})
-                return
-            try:
-                prompt, labels, cand = reader.render(state, q)
-                p, ntok = reader.probs(prompt, labels, cand)
-            except Exception as e:
-                self._json(400, {"error": f"{type(e).__name__}: {e}"})
+            # `state` may be a string or a JSON object (Decision Index format), never a guess.
+            if isinstance(state, dict):
+                state = json.dumps(state, ensure_ascii=False, sort_keys=True)
+            if not isinstance(state, str) or not isinstance(questions, dict):
+                self._json(400, {"error": "need state (string or object) and a questions map"})
                 return
 
-            qtype = q.get("type")
-            if qtype == "noul":
-                ans = {"id": "decision", "type": "noul", "noul": float(p[0])}
-            elif qtype == "score":
-                ans = {"id": "decision", "type": "score",
-                       "probabilities": {lab: float(x) for lab, x in zip(labels, p)}}
-            else:
-                best = labels[max(range(len(p)), key=lambda i: p[i])]
-                ans = {"id": "decision", "type": "choice", "choice": best,
-                       "probabilities": {lab: float(x) for lab, x in zip(labels, p)}}
+            answers, ntok = {}, 0
+            for key, q in questions.items():
+                if not isinstance(q, dict):
+                    continue
+                try:
+                    rendered = reader.render(state, q)
+                    if len(rendered) == 4:          # labels need >1 token each
+                        prompt, labels, _, token_strings = rendered
+                        p, n = reader.probs_multi(prompt, token_strings)
+                    else:
+                        prompt, labels, cand = rendered
+                        p, n = reader.probs(prompt, labels, cand)
+                except Exception as e:
+                    self._json(400, {"error": f"{type(e).__name__}: {e}"})
+                    return
+                ntok += n
+                qtype = q.get("type")
+                if qtype == "noul":
+                    answers[key] = {"id": key, "type": "noul", "noul": float(p[0])}
+                    continue
+                probs = {lab: float(x) for lab, x in zip(labels, p)}
+                if qtype == "score":
+                    answers[key] = {"id": key, "type": "score", "probabilities": probs}
+                else:
+                    best = labels[max(range(len(p)), key=lambda i: p[i])]
+                    answers[key] = {"id": key, "type": "choice", "choice": best,
+                                    "probabilities": probs}
 
             self._json(200, {
-                "answers": {"decision": ans},
+                "answers": answers,
                 "model": f"{reader.base}+{reader.adapter or 'base'}",
                 "usage": {"input_tokens": ntok, "output_tokens": 0},
                 "latency_ms": int((time.perf_counter() - t0) * 1000),

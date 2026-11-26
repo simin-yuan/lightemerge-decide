@@ -12,6 +12,16 @@ from typing import Any
 
 LETTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 
+
+def letter(i: int) -> str:
+    """A..Z, then AA..AZ, BA..: single-column labels stop at 26, and the wire
+    contract allows up to 255 options per question."""
+    out, n = "", i + 1
+    while n > 0:
+        n, r = divmod(n - 1, 26)
+        out = chr(65 + r) + out
+    return out
+
 CHOICE_HEADER = "Options:"
 CHOICE_TAIL = "Answer with the option letter only."
 SCORE_HEADER = "Levels:"
@@ -39,14 +49,15 @@ def _render_choice_sections(state: str, instructions: str, options: list[str],
                             descriptions: list | None = None):
     parts = ["### State", state, "### Question", instructions,
              "### Options (pick exactly one)"]
+    labs = [letter(i) for i in range(len(options))]
     for i, key in enumerate(options):
         desc = descriptions[i] if descriptions else None
-        line = f"{LETTERS[i]}. {key}"
+        line = f"{labs[i]}. {key}"
         if desc is not None and str(desc).strip():
             line += f": {desc}"
         parts.append(line)
     parts.append("Answer:")
-    return "\n".join(parts), list(options), [f" {LETTERS[i]}" for i in range(len(options))]
+    return "\n".join(parts), list(options), [f" {lab}" for lab in labs]
 
 
 
@@ -55,10 +66,11 @@ def render_choice(state: str, instructions: str, options: list[str],
     """options: ordered label list. Returns (prompt, labels, letter tokens)."""
     if STYLE == "sections":
         return _render_choice_sections(state, instructions, options, descriptions)
-    lines = [f"{LETTERS[i]}. {lab}" for i, lab in enumerate(options)]
+    labs = [letter(i) for i in range(len(options))]
+    lines = [f"{labs[i]}. {lab}" for i, lab in enumerate(options)]
     prompt = (f"{state}\n\n{instructions}\n\n{CHOICE_HEADER}\n"
               + "\n".join(lines) + f"\n{CHOICE_TAIL}\nAnswer:")
-    return prompt, list(options), [f" {LETTERS[i]}" for i in range(len(options))]
+    return prompt, list(options), [f" {lab}" for lab in labs]
 
 
 def render_noul(state: str, instructions: str, true_desc: str | None,
