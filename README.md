@@ -96,6 +96,19 @@ Four local rulers were used. **They are our own sets, not the official leaderboa
 scores here are not comparable to published leaderboard numbers; see the ruler notes in the model
 card before quoting any figure.
 
+## Desktop app
+
+A Windows desktop client that runs this model on plain CPU, with no API key and no network calls:
+paste a chat line and it returns the intent class, a suggested action, and a scam warning.
+
+v0.1 measured numbers (13 Chinese conversations: 8 seen during development, 5 unseen):
+
+- all three outputs correct: 8 / 13
+- intent classification: 10–11 / 13
+- latency: 3.7–10.7 s per call (CPU, fp32); first call 24–31 s including model load
+
+Code: https://github.com/simin-yuan/lightemerge-chat-windows (MIT)
+
 ## Files
 
 ```
